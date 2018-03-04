@@ -26,7 +26,7 @@ public final class ProductContract {
         public final static String SUPPLIER_NAME = "supplier_name";
         public final static String SUPPLIER_PHONE_NUMBER = "supplier_phone";
         public final static String STOCK_STATUS ="stock_status";
-        public final static String SUPPLIER_ID ="supplier_id";
+//        public final static String SUPPLIER_ID ="supplier_id";
 
         /**POSSIBLE VALUES FOR IN_STOCK*/
         public final static int IN_STOCK = 1;
