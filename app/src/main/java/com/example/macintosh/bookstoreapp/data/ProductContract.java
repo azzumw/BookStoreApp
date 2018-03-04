@@ -40,7 +40,7 @@ public final class ProductContract {
 
         /**UNIQUE ID NUMBER*/
         public final static String SUP_ID = BaseColumns._ID;
-        public final static String name = "name";
+        public final static String NAME = "name";
         public final static String phone = "phone";
     }
 }
