@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BookStoreApp</string>
+    <string name="insert">insert</string>
 </resources>

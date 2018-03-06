@@ -34,11 +34,13 @@ public class ProductDbHelper extends SQLiteOpenHelper {
                 ProductEntry.STOCK_STATUS + " INTEGER NOT NULL, "+
                 ProductEntry.SUPPLIER_NAME + " TEXT NOT NULL, " +
                 ProductEntry.SUPPLIER_PHONE_NUMBER + " TEXT);";
+//              ProductEntry.SUPPLIER_ID + " INTEGER REFERENCES "+ SupplierEntry.TABLE_NAME +");";
+//              FOREIGN KEY(SUPPLIER_ID) REFERENCES ProductEntry.TABLE_NAME(ProductEntry.PRODUCT_ID));
 
         final String CREATE_SUPPLIER_TABLE = "CREATE TABLE "+ SupplierEntry.TABLE_NAME + " ("
                 + SupplierEntry.SUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + SupplierEntry.NAME + " TEXT NOT NULL, "
-                + SupplierEntry.phone + " TEXT);";
+                + SupplierEntry.PHONE + " TEXT);";
 
         sqLiteDatabase.execSQL(CREATE_PRODUCT_TABLE);
 
