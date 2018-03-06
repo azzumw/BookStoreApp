@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ProductDbHelper mDbHelper;
     private SQLiteDatabase db;
+    private long newRowSuppID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +31,12 @@ public class MainActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
 
         displayDatabaseInfo();
+        insertSupplierData();
 
         insertBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertData();
+                insertProductData();
                 displayDatabaseInfo();
             }
         });
@@ -65,24 +67,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void insertData(){
+    private void insertProductData(){
         // Gets the data repository in write mode
         db = mDbHelper.getWritableDatabase();
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
+
         values.put(ProductEntry.NAME,"Quiet - The Power of Introverts");
         values.put(ProductEntry.PRICE,6);
         values.put(ProductEntry.QUANTITY,5);
         values.put(ProductEntry.STOCK_STATUS,ProductEntry.IN_STOCK);
-        values.put(ProductEntry.SUPPLIER_NAME,"Amazon");
-        values.put(ProductEntry.SUPPLIER_PHONE_NUMBER,"02056897464");
+        values.put(ProductEntry.SUPPLIER_ID,SupplierEntry.SUP_ID);
 
         // Insert the new row, returning the primary key value of the new row,e lse -1
         //null here means it does not create any row if you didnt provide values otherwise
         //it will insert row with null values.
-        long newRowId = db.insert(ProductEntry.TABLE_NAME, null, values);
+        long newRowProdId = db.insert(ProductEntry.TABLE_NAME, null, values);
+        Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
 
-        Log.v("MainActivity: ","New Row ID: " + newRowId);
+        Log.v("MainActivity: ","New Product Row ID: " + newRowProdId);
+    }
+
+    private void insertSupplierData(){
+        ContentValues values = new ContentValues();
+
+        values.put(SupplierEntry.NAME,"Amazon");
+        values.put(SupplierEntry.PHONE,"02056897464");
+        newRowSuppID = db.insert(SupplierEntry.TABLE_NAME,null,values);
+
+        Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
     }
 }

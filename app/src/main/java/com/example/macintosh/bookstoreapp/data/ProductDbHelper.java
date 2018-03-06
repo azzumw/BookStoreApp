@@ -32,10 +32,13 @@ public class ProductDbHelper extends SQLiteOpenHelper {
                 ProductEntry.PRICE + " INTEGER NOT NULL, " +
                 ProductEntry.QUANTITY+ " INTEGER, " +
                 ProductEntry.STOCK_STATUS + " INTEGER NOT NULL, "+
-                ProductEntry.SUPPLIER_NAME + " TEXT NOT NULL, " +
-                ProductEntry.SUPPLIER_PHONE_NUMBER + " TEXT);";
-//              ProductEntry.SUPPLIER_ID + " INTEGER REFERENCES "+ SupplierEntry.TABLE_NAME +");";
-//              FOREIGN KEY(SUPPLIER_ID) REFERENCES ProductEntry.TABLE_NAME(ProductEntry.PRODUCT_ID));
+                ProductEntry.SUPPLIER_ID + " INTEGER NOT NULL,"+
+                "FOREIGN KEY("+ProductEntry.SUPPLIER_ID+") REFERENCES "+ SupplierEntry.NAME+"("+SupplierEntry.SUP_ID+"));";
+//                ProductEntry.SUPPLIER_ID + " INTEGER REFERENCES "+ SupplierEntry.TABLE_NAME +");";
+//                ProductEntry.SUPPLIER_NAME + " TEXT NOT NULL, " +
+//                ProductEntry.SUPPLIER_PHONE_NUMBER + " TEXT);";
+//
+//              "FOREIGN KEY("+SUPPLIER_ID) REFERENCES ProductEntry.TABLE_NAME(ProductEntry.PRODUCT_ID));
 
         final String CREATE_SUPPLIER_TABLE = "CREATE TABLE "+ SupplierEntry.TABLE_NAME + " ("
                 + SupplierEntry.SUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -43,6 +46,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
                 + SupplierEntry.PHONE + " TEXT);";
 
         sqLiteDatabase.execSQL(CREATE_PRODUCT_TABLE);
+        sqLiteDatabase.execSQL(CREATE_SUPPLIER_TABLE);
 
     }
 
