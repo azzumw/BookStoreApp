@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button insertBtn = findViewById(R.id.insertButton);
+        final Button queryBtn = findViewById(R.id.Query_db);
         displayView =  findViewById(R.id.textView);
 
 
@@ -37,18 +38,24 @@ public class MainActivity extends AppCompatActivity {
 
 //        displayDatabaseInfo();
             insertSupplierData();
-            queryData();
+//            queryData();
 
 
         insertBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 insertProductData();
-                queryData();
+//                queryData();
 //                displayDatabaseInfo();
             }
         });
 
+        queryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                queryData();
+            }
+        });
 
     }
 
@@ -94,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
         long newRowProdId = db.insert(ProductEntry.TABLE_NAME, null, values);
 //        Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
 
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ProductEntry.TABLE_NAME,null);
+
+        displayView.setText("Number of rows in bookstore database table: " + cursor.getCount());
         Log.v("MainActivity: ","New Product Row ID: " + newRowProdId);
     }
 
@@ -102,11 +112,13 @@ public class MainActivity extends AppCompatActivity {
         // Gets the data repository in write mode
         db = mDbHelper.getWritableDatabase();
 
+
         ContentValues values = new ContentValues();
 
         values.put(SupplierEntry.NAME,"Amazon");
         values.put(SupplierEntry.PHONE,"02056897464");
         long newRowSuppID = db.insert(SupplierEntry.TABLE_NAME,null,values);
+
 
         Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
     }
@@ -114,47 +126,42 @@ public class MainActivity extends AppCompatActivity {
     private void queryData(){
         db = mDbHelper.getReadableDatabase();
 
+//        String [] projections = {ProductEntry.PRODUCT_ID,ProductEntry.NAME,ProductEntry.PRICE,SupplierEntry.SUP_ID,SupplierEntry.TABLE_NAME+"."+SupplierEntry.NAME};
 
+        final String QUERY = "SELECT *"
+                + " FROM " + ProductEntry.TABLE_NAME + " P"
+                + " INNER JOIN "+ SupplierEntry.TABLE_NAME + " S"
+                + " ON S."+ SupplierEntry.SUP_ID + " = " + "P." +ProductEntry.SUPPLIER_ID;
 
-         final String QUERY = "SELECT "
-                      + ProductEntry.TABLE_NAME+ "." + ProductEntry.PRODUCT_ID + ","
-                      + ProductEntry.TABLE_NAME+ "." + ProductEntry.NAME + ","
-                      + ProductEntry.TABLE_NAME+ "." + ProductEntry.PRICE + ","
-                      + SupplierEntry.TABLE_NAME+"." + SupplierEntry.NAME
-                      + " FROM " + ProductEntry.TABLE_NAME
-                      + " INNER JOIN "+ SupplierEntry.TABLE_NAME
-                      + " ON " + ProductEntry.TABLE_NAME + "." + ProductEntry.SUPPLIER_ID + " = "+ SupplierEntry.TABLE_NAME+"."+SupplierEntry.SUP_ID;
 
 
          Cursor cursor = db.rawQuery(QUERY,null);
 
-
         try{
 
             displayView.setText("Number of rows in bookstore database table: " + cursor.getCount());
-
             //display header
             displayView.append("\n"+ProductEntry.PRODUCT_ID+ "\t\t| "+
                     ProductEntry.NAME + "\t\t| "+
-                    ProductEntry.PRICE+"\t\t| "+
                     SupplierEntry.NAME);
 
             //Figure out the index of each column
-            int idColIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_ID);
-            int nameColIndex = cursor.getColumnIndex(ProductEntry.NAME);
-            int priceColIndex = cursor.getColumnIndex(ProductEntry.PRICE);
-            int suppNameIndex = cursor.getColumnIndex(SupplierEntry.NAME);
+            int idColIndex = cursor.getColumnIndexOrThrow(ProductEntry.PRODUCT_ID);
+            int nameColIndex = cursor.getColumnIndexOrThrow(ProductEntry.NAME);
+//            int priceColIndex = cursor.getColumnIndexOrThrow(ProductEntry.PRICE);
+            int suppNameIndex = cursor.getColumnIndexOrThrow(SupplierEntry.NAME);
 
             //iterate through all the returnd rows in the cursor
             while(cursor.moveToNext()){
                 int currentID = cursor.getInt(idColIndex);
                 String currentName = cursor.getString(nameColIndex);
-                int currentprice = cursor.getInt(priceColIndex);
+//                int currentprice = cursor.getInt(priceColIndex);
                 String supplName = cursor.getString(suppNameIndex);
+
+
 
                 displayView.append("\n"+currentID + "\t|" +
                                         currentName + "\t\t|" +
-                                        currentprice + "\t|"+
                                         supplName);
             }
         }
