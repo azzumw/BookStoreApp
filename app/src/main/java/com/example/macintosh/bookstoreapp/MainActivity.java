@@ -17,10 +17,8 @@ import com.example.macintosh.bookstoreapp.data.ProductDbHelper;
 public class MainActivity extends AppCompatActivity {
 
     private ProductDbHelper mDbHelper;
-    private SQLiteDatabase db;
-//    private long newRowSuppID;
 
-    TextView displayView;
+    private TextView displayView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mDbHelper = new ProductDbHelper(this);
+
         // Create and/or open a database to read from it
 
 
@@ -60,16 +59,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        mDbHelper = new ProductDbHelper(this);
-
-        // Create and/or open a database to read from it
-        db = mDbHelper.getReadableDatabase();
-
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " +ProductEntry.TABLE_NAME, null);
+        Cursor cursor = mDbHelper.getAllProducts();
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
@@ -83,59 +75,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void insertProductData(){
-        // Gets the data repository in write mode
-        db = mDbHelper.getWritableDatabase();
-
-        // Create a new map of values, where column names are the keys
-        ContentValues values = new ContentValues();
-
-        values.put(ProductEntry.NAME,"Quiet - The Power of Introverts");
-        values.put(ProductEntry.PRICE,6);
-        values.put(ProductEntry.QUANTITY,5);
-        values.put(ProductEntry.STOCK_STATUS,ProductEntry.IN_STOCK);
-        values.put(ProductEntry.SUPPLIER_ID,SupplierEntry.SUP_ID);
-
-        // Insert the new row, returning the primary key value of the new row,e lse -1
-        //null here means it does not create any row if you didnt provide values otherwise
-        //it will insert row with null values.
-        long newRowProdId = db.insert(ProductEntry.TABLE_NAME, null, values);
+        long newRowProdId = mDbHelper.insertProduct(1L);
 //        Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
 
-        Cursor cursor = db.rawQuery("SELECT * FROM "+ProductEntry.TABLE_NAME,null);
+        Cursor cursor = mDbHelper.getAllProducts();
 
         displayView.setText("Number of rows in bookstore database table: " + cursor.getCount());
         Log.v("MainActivity: ","New Product Row ID: " + newRowProdId);
     }
 
     private void insertSupplierData(){
-
-        // Gets the data repository in write mode
-        db = mDbHelper.getWritableDatabase();
-
-
-        ContentValues values = new ContentValues();
-
-        values.put(SupplierEntry.NAME,"Amazon");
-        values.put(SupplierEntry.PHONE,"02056897464");
-        long newRowSuppID = db.insert(SupplierEntry.TABLE_NAME,null,values);
-
-
+        long newRowSuppID = mDbHelper.insertSupplier();
         Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
     }
 
     private void queryData(){
-        db = mDbHelper.getReadableDatabase();
-
 //        String [] projections = {ProductEntry.PRODUCT_ID,ProductEntry.NAME,ProductEntry.PRICE,SupplierEntry.SUP_ID,SupplierEntry.TABLE_NAME+"."+SupplierEntry.NAME};
-
-        final String QUERY = "SELECT *"
-                + " FROM " + ProductEntry.TABLE_NAME + " P"
-                + " INNER JOIN "+ SupplierEntry.TABLE_NAME + " S"
-                + " ON S."+ SupplierEntry.SUP_ID + " = " + "P." +ProductEntry.SUPPLIER_ID;
-
-
-
-         Cursor cursor = db.rawQuery(QUERY,null);
+         Cursor cursor = mDbHelper.getJoinedRows();
+         Log.v("MainActivity" , cursor.toString());
 
         try{
 
@@ -146,21 +103,20 @@ public class MainActivity extends AppCompatActivity {
                     SupplierEntry.NAME);
 
             //Figure out the index of each column
-            int idColIndex = cursor.getColumnIndexOrThrow(ProductEntry.PRODUCT_ID);
-            int nameColIndex = cursor.getColumnIndexOrThrow(ProductEntry.NAME);
+//            int idColIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_ID); //why is the col id 6???
+            int nameColIndex = cursor.getColumnIndex(ProductEntry.NAME);
 //            int priceColIndex = cursor.getColumnIndexOrThrow(ProductEntry.PRICE);
-            int suppNameIndex = cursor.getColumnIndexOrThrow(SupplierEntry.NAME);
-
+             Log.v("MainActivity",cursor.moveToFirst()+"");
             //iterate through all the returnd rows in the cursor
             while(cursor.moveToNext()){
-                int currentID = cursor.getInt(idColIndex);
-                String currentName = cursor.getString(nameColIndex);
+//                int currentID = cursor.getInt(idColIndex);
+                String currentName = cursor.getString(1);
 //                int currentprice = cursor.getInt(priceColIndex);
-                String supplName = cursor.getString(suppNameIndex);
+                String supplName = cursor.getString(2);
 
 
 
-                displayView.append("\n"+currentID + "\t|" +
+                displayView.append("\n" + "\t|" +
                                         currentName + "\t\t|" +
                                         supplName);
             }
