@@ -17,7 +17,7 @@ public final class ProductContract {
         public final static String TABLE_NAME = "products";
 
         /**UNIQUE ID NUMBER*/
-        public final static String PRODUCT_ID = BaseColumns._ID;
+        public final static String PRODUCT_ID = BaseColumns._ID; //"_id"
 
         /**COLUMNS*/
         public final static String NAME = "name";
@@ -39,7 +39,7 @@ public final class ProductContract {
         public final static String TABLE_NAME = "supplier";
 
         /**UNIQUE ID NUMBER*/
-        public final static String SUP_ID = BaseColumns._ID;
+        public final static String SUP_ID = BaseColumns._ID; //_id
         public final static String NAME = "supp_name";
         public final static String PHONE = "PHONE";
     }

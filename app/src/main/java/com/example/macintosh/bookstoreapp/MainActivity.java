@@ -1,11 +1,12 @@
 package com.example.macintosh.bookstoreapp;
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,7 +18,7 @@ import com.example.macintosh.bookstoreapp.data.ProductDbHelper;
 public class MainActivity extends AppCompatActivity {
 
     private ProductDbHelper mDbHelper;
-
+    private Cursor cursor;
     private TextView displayView;
 
     @Override
@@ -25,74 +26,99 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button insertBtn = findViewById(R.id.insertButton);
-        final Button queryBtn = findViewById(R.id.Query_db);
+        final Button queryBtn = findViewById(R.id.Query_Prod);
+        final Button querySupplierButton = findViewById(R.id.query_supplier_table);
+
         displayView =  findViewById(R.id.textView);
 
 
         mDbHelper = new ProductDbHelper(this);
+        String dbName = mDbHelper.getDatabaseName();
 
-        // Create and/or open a database to read from it
+        displayView.setText("Database: "+ dbName);
 
+        insertSupplierData();
 
-//        displayDatabaseInfo();
-            insertSupplierData();
-//            queryData();
-
-
-        insertBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                insertProductData();
-//                queryData();
-//                displayDatabaseInfo();
-            }
-        });
 
         queryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                queryData();
+                queryProductData();
+            }
+        });
+
+        querySupplierButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                querySupplierData();
             }
         });
 
     }
 
-    private void displayDatabaseInfo() {
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = mDbHelper.getAllProducts();
-        try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-
-            displayView.setText("Number of rows in bookstore database table: " + cursor.getCount());
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_insert_dummy_data:
+                        insertProductData();break;
+            case R.id.action_delete_all:
+                        mDbHelper.deleteAllProducts();
+        }
+
+        return true;
+    }
+
+
+    /** inserts data in to the products table by fetching supplier Id from the supplier Table*/
     private void insertProductData(){
-        long newRowProdId = mDbHelper.insertProduct(1L);
+
+        cursor = mDbHelper.getAllSuppliers();
+        int suppIDIndex = cursor.getColumnIndex(SupplierEntry.SUP_ID);
+        cursor.moveToFirst();
+        int supplierIDColvalue = cursor.getInt(suppIDIndex);
+
+        long newRowProdId = mDbHelper.insertProduct(supplierIDColvalue);
 //        Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
 
-        Cursor cursor = mDbHelper.getAllProducts();
+         cursor = mDbHelper.getAllProducts();
 
         displayView.setText("Number of rows in bookstore database table: " + cursor.getCount());
         Log.v("MainActivity: ","New Product Row ID: " + newRowProdId);
     }
 
+    /**
+     * Inserts Supplier Data before Product Data can be inserted due to FK constraints.
+     * is called when activity starts
+     * */
     private void insertSupplierData(){
         long newRowSuppID = mDbHelper.insertSupplier();
-        Log.v("MainActivity: ","New Supplier Row ID: " + newRowSuppID);
+        Log.v("Mainactivity:","Row_id "+ newRowSuppID);
+
+        if(newRowSuppID!=-1) {
+            Snackbar.make(findViewById(R.id.relative_layout), "Supplier added to " + SupplierEntry.TABLE_NAME + " Table.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        }
+
+        else
+            Snackbar.make(findViewById(R.id.relative_layout), "Error adding " + SupplierEntry.TABLE_NAME + " information.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+
     }
 
-    private void queryData(){
-//        String [] projections = {ProductEntry.PRODUCT_ID,ProductEntry.NAME,ProductEntry.PRICE,SupplierEntry.SUP_ID,SupplierEntry.TABLE_NAME+"."+SupplierEntry.NAME};
-         Cursor cursor = mDbHelper.getJoinedRows();
-         Log.v("MainActivity" , cursor.toString());
+    /**Query the products table. */
+    private void queryProductData(){
+
+        cursor = mDbHelper.getAllProducts();
+
 
         try{
 
@@ -100,31 +126,66 @@ public class MainActivity extends AppCompatActivity {
             //display header
             displayView.append("\n"+ProductEntry.PRODUCT_ID+ "\t\t| "+
                     ProductEntry.NAME + "\t\t| "+
-                    SupplierEntry.NAME);
+                    ProductEntry.SUPPLIER_ID);
+
+
+//            int priceColIndex = cursor.getColumnIndexOrThrow(ProductEntry.PRICE);
 
             //Figure out the index of each column
-//            int idColIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_ID); //why is the col id 6???
+            int idColIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_ID); //why is the col id 6???
             int nameColIndex = cursor.getColumnIndex(ProductEntry.NAME);
-//            int priceColIndex = cursor.getColumnIndexOrThrow(ProductEntry.PRICE);
-             Log.v("MainActivity",cursor.moveToFirst()+"");
+            int suppColIndex = cursor.getColumnIndex(ProductEntry.SUPPLIER_ID);
             //iterate through all the returnd rows in the cursor
             while(cursor.moveToNext()){
-//                int currentID = cursor.getInt(idColIndex);
-                String currentName = cursor.getString(1);
-//                int currentprice = cursor.getInt(priceColIndex);
-                String supplName = cursor.getString(2);
+
+
+                long currentID = cursor.getLong(idColIndex);
+                String currentName = cursor.getString(nameColIndex);
+                String currentSuppId = cursor.getString(suppColIndex);
 
 
 
-                displayView.append("\n" + "\t|" +
-                                        currentName + "\t\t|" +
-                                        supplName);
+                displayView.append("\n" +currentID +  "\t|" + currentName + " | \t"+ currentSuppId);
             }
         }
         finally {
             cursor.close();
         }
 
+
+    }
+
+    private void querySupplierData(){
+        cursor = mDbHelper.getAllSuppliers();
+
+        try{
+
+            displayView.setText("Number of rows in bookstore database supplier table: " + cursor.getCount());
+            //display header
+            displayView.append("\n"+SupplierEntry.SUP_ID+ "\t\t| "+
+                    SupplierEntry.NAME + "\t\t| "+
+                    SupplierEntry.PHONE);
+
+            //Figure out the index of each column
+            int idColIndex = cursor.getColumnIndex(SupplierEntry.SUP_ID); //why is the col id 6???
+            int nameColIndex = cursor.getColumnIndex(SupplierEntry.NAME);
+            int suppColIndex = cursor.getColumnIndex(SupplierEntry.PHONE);
+
+            while(cursor.moveToNext()){
+
+
+                long currentID = cursor.getLong(idColIndex);
+                String currentName = cursor.getString(nameColIndex);
+                String currentPhone = cursor.getString(suppColIndex);
+
+
+
+                displayView.append("\n" +currentID +  "\t|" + currentName + " | \t"+ currentPhone);
+            }
+        }
+        finally {
+            cursor.close();
+        }
 
     }
 }

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.macintosh.bookstoreapp.MainActivity">
@@ -12,19 +13,20 @@
         android:id="@+id/textView"
         android:text="Hello World!" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/insertButton"
-        android:text="@string/insert"
-        android:layout_below="@+id/textView"
-        android:layout_marginTop="60dp"/>
+
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/Query_db"
-        android:text="QUERY DB"
-        android:layout_below="@id/insertButton"/>
+        android:id="@+id/Query_Prod"
+        android:text="@string/query_prod"
+        android:layout_below="@id/textView"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/query_supplier_table"
+        android:text="@string/query_supp"
+        android:layout_below="@id/Query_Prod"/>
 
 </RelativeLayout>

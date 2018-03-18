@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">BookStoreApp</string>
     <string name="insert">insert</string>
+    <string name="insertDummyData">Insert Dummy Data</string>
+    <string name="del">Delete All</string>
+    <string name="query_supp">Query Supplier</string>
+    <string name="query_prod">Query Product</string>
 </resources>
