@@ -69,15 +69,5 @@ public class ProductDbHelperTest {
         assertEquals(2, count);
     }
 
-    @Test
-    public void test_join_query() throws Exception {
-        long supplierId = target.insertSupplier();
-        target.insertProduct(supplierId);
 
-        Cursor cursor = target.getJoinedRows();
-
-        int count = cursor.getCount();
-
-        assertEquals(1, count);
-    }
 }
